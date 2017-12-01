@@ -13,7 +13,7 @@ var (
 	exitChan chan bool
 )
 
-func Run(chans ...chan bool) {
+func Run(waitTime int, chans ...chan bool) {
 	exitChan = make(chan bool)
 
 	log.Println("[info]", "Перехват сигналов инициализирован")
@@ -25,7 +25,7 @@ func Run(chans ...chan bool) {
 	waitExit(c)
 
 	go func() {
-		time.Sleep(10 * time.Second)
+		time.Sleep(time.Duration(waitTime) * time.Second)
 		log.Println("[error]", "Неудалось завершить работу корректно")
 
 		os.Exit(2)
