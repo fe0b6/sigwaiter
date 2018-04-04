@@ -1,4 +1,3 @@
-// Завершатель работы корректно
 package sigwaiter
 
 import (
@@ -10,9 +9,11 @@ import (
 )
 
 var (
-	exitChan chan bool
+	exitChan      chan bool
+	ignoreSignals []string
 )
 
+// Run - запускаем ожидание сигналов
 func Run(waitTime int, chans ...chan bool) {
 	exitChan = make(chan bool)
 
@@ -45,6 +46,12 @@ func waitExit(c chan os.Signal) {
 	for {
 		select {
 		case s := <-c:
+			for _, is := range ignoreSignals {
+				if is == s.String() {
+					continue
+				}
+			}
+
 			log.Println("[info]", "Получен сигнал: ", s)
 			return
 		case <-exitChan:
@@ -54,6 +61,12 @@ func waitExit(c chan os.Signal) {
 	}
 }
 
+// SetIgnoreSignal - указываем какие сигналы игнорируем
+func SetIgnoreSignal(arr []string) {
+	ignoreSignals = arr
+}
+
+// Exit - функция корректного выхода
 func Exit() {
 	exitChan <- true
 }
