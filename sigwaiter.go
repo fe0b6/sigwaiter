@@ -46,14 +46,19 @@ func waitExit(c chan os.Signal) {
 	for {
 		select {
 		case s := <-c:
+			var ignore bool
 			for _, is := range ignoreSignals {
 				if is == s.String() {
-					continue
+					ignore = true
+					break
 				}
 			}
 
-			log.Println("[info]", "Получен сигнал: ", s)
-			return
+			if !ignore {
+				log.Println("[info]", "Получен сигнал: ", s)
+				return
+			}
+
 		case <-exitChan:
 			log.Println("[info]", "Самоинициализированный выход")
 			return
