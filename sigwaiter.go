@@ -21,7 +21,7 @@ func Run(waitTime int, chans ...chan bool) {
 
 	// Перехват сигналов
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, syscall.SIGTERM, os.Interrupt)
+	signal.Notify(c, syscall.SIGTERM, syscall.SIGKILL, os.Interrupt)
 
 	waitExit(c)
 
