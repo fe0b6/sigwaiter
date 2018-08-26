@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 )
@@ -11,6 +12,7 @@ import (
 var (
 	exitChan      chan bool
 	ignoreSignals []string
+	wg            sync.WaitGroup
 )
 
 // Run - запускаем ожидание сигналов
@@ -32,10 +34,15 @@ func Run(waitTime int, chans ...chan bool) {
 		os.Exit(2)
 	}()
 
+	wg.Add(len(chans))
 	for _, ch := range chans {
-		ch <- true
-		_ = <-ch
+		go func(ch chan bool) {
+			ch <- true
+			_ = <-ch
+			wg.Done()
+		}(ch)
 	}
+	wg.Wait()
 
 	log.Println("[info]", "Работа завершена корректно")
 
